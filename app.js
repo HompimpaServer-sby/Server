@@ -20,18 +20,31 @@ const DB = {
 let DbRockPaper = []
 
 io.on("connection", (socket) => {
-    // Push data to DB.onlineUsers
-    DB.onlineUsers.push({
-        username: socket.handshake.auth.username,
-        socketId: socket.id
-    })
 
+    socket.on("join_room", (data) => {
+        socket.join(data);
+        console.log(`User with ID: ${socket.id} joined room: ${data}`);
+        console.log(DB.onlineUsers, "ini DB user");
+        // Push data to DB.onlineUsers
+        DB.onlineUsers.push({
+            username: socket.handshake.auth.username,
+            socketId: socket.id,
+            roomId: data
+        })
+        
+    });
+    
     // Untuk mentriger user online setelah refresh ulang
-    socket.on("user:get", () => {
-        socket.emit("users:online", DB.onlineUsers)
+    socket.on("user:get", (roomId) => {
+        console.log(DB.onlineUsers, "ini DB user get");
+        let roomUser = DB.onlineUsers.filter(el => el.roomId == roomId)
+        console.log(roomUser, "ini room user");
+        
+        io.to(roomId).emit("users:online", roomUser)
     })
+   
 
-    io.emit("users:online", DB.onlineUsers)
+    // io.emit("users:online", DB.onlineUsers)
 
     //  Logic untuk hompimpang dan eleminasi user
     socket.on("choose", (num) => {
@@ -126,12 +139,10 @@ io.on("connection", (socket) => {
         console.log(DbRockPaper, "<<DbRockPaper");
     })
     
-
-
     socket.on("disconnect", () => {
         DB.onlineUsers = DB.onlineUsers.filter((el) => el.socketId !== socket.id);
-    
-        io.emit("users:online", DB.usersHandChooses);
+        console.log(DB.onlineUsers, "disconnect");
+        io.emit("users:online", DB.onlineUsers);
     });
 });
 
