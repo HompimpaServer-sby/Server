@@ -112,9 +112,15 @@ io.on("connection", (socket) => {
                 win = DbRockPaper[0]
             }
 
-            DB.onlineUsers = DB.onlineUsers.filter(el => {
-                return el.socketId === win.socketId
-            })
+
+            if(DbRockPaper[0].num !== DbRockPaper[1].num) {
+                DB.onlineUsers = DB.onlineUsers.filter(el => {
+                    return el.socketId === win.socketId
+                })
+            } else {
+                win = 0
+            }
+            
 
 
             DbRockPaper = []
