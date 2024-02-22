@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         DB.onlineUsers = DB.onlineUsers.filter((el) => el.socketId !== socket.id);
     
-        io.emit("users:online", DB.usersHandChooses);
+        io.emit("users:online", DB.onlineUsers);
     });
 });
 
